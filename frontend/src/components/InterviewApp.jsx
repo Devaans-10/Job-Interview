@@ -9,7 +9,7 @@ import { getInterviewHistory } from '../utils/localStorage';
 import { FaHistory, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
 function InterviewApp() {
   const [jobTitle, setJobTitle] = useState('');
