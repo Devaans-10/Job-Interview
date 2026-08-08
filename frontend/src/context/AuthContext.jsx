@@ -1,95 +1,176 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext();
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5000');
+// Mock user database (in memory)
+const MOCK_USERS = [
+  { 
+    id: '1', 
+    name: 'Devaans Patwari', 
+    email: 'pdevaans@gmail.com', 
+    password: 'Password123' 
+  }
+];
 
-export function AuthProvider({ children }) {
+// Create context
+const AuthContext = createContext(null);
+
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('authToken'));
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Configure axios to always send token if available
+  // Check if user is logged in on app load
   useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      localStorage.setItem('authToken', token);
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-      localStorage.removeItem('authToken');
+    const savedUser = localStorage.getItem('authUser');
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (err) {
+        localStorage.removeItem('authUser');
+      }
     }
-  }, [token]);
-
-  // Check auth on load
-  useEffect(() => {
-    checkAuth();
+    setIsInitialized(true);
   }, []);
 
-  const checkAuth = async () => {
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const res = await axios.get(`${API_URL}/api/auth/me`);
-      setUser(res.data.user);
-    } catch (err) {
-      console.error('Auth verification failed:', err);
-      // Token invalid or expired
-      logout();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (email, password, rememberMe) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, { email, password, rememberMe });
-      setToken(res.data.token);
-      setUser(res.data.user);
-      return { success: true };
-    } catch (err) {
-      const message = err.response?.data?.error || 'Connection failed, try again';
-      setError(message);
-      return { success: false, error: message };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Mock signup
   const signup = async (name, email, password) => {
     setIsLoading(true);
     setError(null);
+
     try {
-      const res = await axios.post(`${API_URL}/api/auth/signup`, { name, email, password });
-      setToken(res.data.token);
-      setUser(res.data.user);
-      return { success: true };
+      // Validate inputs
+      if (!name || !email || !password) {
+        throw new Error('All fields are required');
+      }
+
+      if (password.length < 8) {
+        throw new Error('Password must be at least 8 characters');
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        throw new Error('Password must contain an uppercase letter');
+      }
+
+      if (!/\d/.test(password)) {
+        throw new Error('Password must contain a number');
+      }
+
+      if (!email.includes('@')) {
+        throw new Error('Please enter a valid email');
+      }
+
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Check if user already exists
+      const userExists = MOCK_USERS.find(u => u.email === email);
+      if (userExists) {
+        throw new Error('Email already registered. Try logging in instead.');
+      }
+
+      // Create new user
+      const newUser = {
+        id: Date.now().toString(),
+        name,
+        email,
+        password
+      };
+
+      // Add to mock database
+      MOCK_USERS.push(newUser);
+
+      // Set as logged in
+      const loggedInUser = { id: newUser.id, name: newUser.name, email: newUser.email };
+      setUser(loggedInUser);
+      localStorage.setItem('authUser', JSON.stringify(loggedInUser));
+
+      return { success: true, user: loggedInUser };
     } catch (err) {
-      const message = err.response?.data?.error || 'Connection failed, try again';
-      setError(message);
-      return { success: false, error: message };
+      setError(err.message);
+      return { success: false, error: err.message };
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Mock login
+  const login = async (email, password) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Validate inputs
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Find user
+      const foundUser = MOCK_USERS.find(
+        u => u.email === email && u.password === password
+      );
+
+      if (!foundUser) {
+        throw new Error('Invalid email or password');
+      }
+
+      // Set as logged in
+      const loggedInUser = { 
+        id: foundUser.id, 
+        name: foundUser.name, 
+        email: foundUser.email 
+      };
+      setUser(loggedInUser);
+      localStorage.setItem('authUser', JSON.stringify(loggedInUser));
+
+      return { success: true, user: loggedInUser };
+    } catch (err) {
+      setError(err.message);
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Logout
   const logout = () => {
-    setToken(null);
     setUser(null);
-    localStorage.removeItem('authToken');
-    delete axios.defaults.headers.common['Authorization'];
+    setError(null);
+    localStorage.removeItem('authUser');
+  };
+
+  // Clear error
+  const clearError = () => {
+    setError(null);
+  };
+
+  // Context value
+  const value = {
+    user,
+    isLoading,
+    error,
+    isInitialized,
+    signup,
+    login,
+    logout,
+    clearError,
+    isAuthenticated: !!user
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, error, login, signup, logout, checkAuth }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export const useAuth = () => useContext(AuthContext);
+// Custom hook to use auth
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};

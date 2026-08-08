@@ -7,7 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -54,7 +54,7 @@ export default function LoginPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); clearError(); }}
               required
               className="w-full bg-transparent border-b border-[#D7E2EA]/30 text-[#D7E2EA] px-0 py-3 focus:outline-none focus:border-b-2 focus:border-[#B600A8] transition-colors placeholder-[#D7E2EA]/30"
               placeholder="you@example.com"
@@ -73,7 +73,7 @@ export default function LoginPage() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); clearError(); }}
               required
               className="w-full bg-transparent border-b border-[#D7E2EA]/30 text-[#D7E2EA] px-0 py-3 focus:outline-none focus:border-b-2 focus:border-[#B600A8] transition-colors placeholder-[#D7E2EA]/30"
               placeholder="••••••••"

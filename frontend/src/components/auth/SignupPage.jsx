@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [passwordStrength, setPasswordStrength] = useState(0); // 0 to 4
   const [formError, setFormError] = useState('');
   
-  const { signup, isLoading, error: authError } = useAuth();
+  const { signup, isLoading, error: authError, clearError } = useAuth();
   const navigate = useNavigate();
 
   // Calculate password strength
@@ -90,7 +90,7 @@ export default function SignupPage() {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => { setName(e.target.value); clearError(); setFormError(''); }}
               required
               className="w-full bg-transparent border-b border-[#D7E2EA]/30 text-[#D7E2EA] px-0 py-2 focus:outline-none focus:border-b-2 focus:border-[#B600A8] transition-colors placeholder-[#D7E2EA]/30"
               placeholder="John Doe"
@@ -104,7 +104,7 @@ export default function SignupPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); clearError(); setFormError(''); }}
               required
               className="w-full bg-transparent border-b border-[#D7E2EA]/30 text-[#D7E2EA] px-0 py-2 focus:outline-none focus:border-b-2 focus:border-[#B600A8] transition-colors placeholder-[#D7E2EA]/30"
               placeholder="you@example.com"
@@ -118,7 +118,7 @@ export default function SignupPage() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); clearError(); setFormError(''); }}
               required
               className="w-full bg-transparent border-b border-[#D7E2EA]/30 text-[#D7E2EA] px-0 py-2 focus:outline-none focus:border-b-2 focus:border-[#B600A8] transition-colors placeholder-[#D7E2EA]/30"
               placeholder="••••••••"
@@ -147,7 +147,7 @@ export default function SignupPage() {
             <input
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => { setConfirmPassword(e.target.value); clearError(); setFormError(''); }}
               required
               className="w-full bg-transparent border-b border-[#D7E2EA]/30 text-[#D7E2EA] px-0 py-2 focus:outline-none focus:border-b-2 focus:border-[#B600A8] transition-colors placeholder-[#D7E2EA]/30"
               placeholder="••••••••"
