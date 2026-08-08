@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: error.message });
     }
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error during login' });
+    res.status(500).json({ error: 'Server error during login: ' + error.message });
   }
 });
 
