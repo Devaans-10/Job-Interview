@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import FadeIn from './FadeIn';
+import WarpText from '../WarpText';
 
 export default function CTASection() {
   const navigate = useNavigate();
@@ -11,12 +12,33 @@ export default function CTASection() {
       
       <div className="relative z-10 max-w-4xl mx-auto py-20 md:py-28 px-5">
         <FadeIn y={30}>
-          <h2 
-            className="text-[clamp(2rem,8vw,3.5rem)] font-black uppercase tracking-tight text-white mb-6"
-            style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.4)' }}
-          >
-            Ready to Ace Your Interview?
-          </h2>
+          <div className="relative overflow-hidden mb-12 md:mb-16 w-full">
+            <WarpText
+              text="Ready to Ace Your Interview?"
+              color="#ffffff"
+              warpStrength={0.1}
+              warpScale={1.5}
+              speed={0.6}
+              pointerInfluence={0.45}
+              pointerStrength={0.4}
+              refraction={0.022}
+              ripple={true}
+              fontSize="clamp(2rem, 7vw, 4.5rem)"
+              fontWeight={800}
+              fontFamily="Kanit, sans-serif"
+              letterSpacing="-0.02em"
+              lineHeight={0.95}
+              style={{
+                height: 'auto',
+                minHeight: '180px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem',
+                textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
+              }}
+            />
+          </div>
         </FadeIn>
         
         <FadeIn delay={0.15} y={30}>

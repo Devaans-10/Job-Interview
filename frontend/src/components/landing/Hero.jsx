@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import FadeIn from './FadeIn';
+import WarpText from '../WarpText';
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -14,10 +15,33 @@ export default function Hero() {
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-premium-gradient rounded-full blur-3xl opacity-10 -z-10 -translate-x-1/2 translate-y-1/2"></div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-        <FadeIn delay={0.15} y={40}>
-          <h1 className="text-[3rem] sm:text-[4rem] md:text-[5rem] lg:text-[6rem] font-black uppercase tracking-tight leading-none text-gradient-hero mb-6">
-            Master Your<br />Interviews
-          </h1>
+        <FadeIn delay={0.15} y={40} className="w-full">
+          <div className="relative overflow-hidden mb-8 md:mb-12 w-full">
+            <WarpText
+              text="Master Your Interviews"
+              color="#D7E2EA"
+              warpStrength={0.08}
+              warpScale={1.7}
+              speed={0.55}
+              pointerInfluence={0.42}
+              pointerStrength={0.38}
+              refraction={0.018}
+              ripple={true}
+              fontSize="clamp(2.5rem, 8vw, 5.5rem)"
+              fontWeight={800}
+              fontFamily="Kanit, sans-serif"
+              letterSpacing="-0.02em"
+              lineHeight={0.95}
+              style={{
+                height: 'auto',
+                minHeight: '200px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '1rem'
+              }}
+            />
+          </div>
         </FadeIn>
 
         <FadeIn delay={0.3} y={20}>
