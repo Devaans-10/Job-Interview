@@ -8,6 +8,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { getInterviewHistory } from '../utils/localStorage';
 import { FaHistory, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { 
+  mockQuestions, 
+  generateMockScore, 
+  generateMockReasoning,
+  generateMockStrengths,
+  generateMockImprovements,
+  getRandomQuestion,
+  generateMockSummary
+} from '../data/mockInterviews';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:5000');
 
@@ -24,16 +33,26 @@ function InterviewApp() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const MAX_QUESTIONS = 5;
+  const [askedQuestionIds, setAskedQuestionIds] = useState([]);
+  const [scores, setScores] = useState([]);
+  const [answers, setAnswers] = useState([]);
+
+  const MAX_QUESTIONS = 7; // Changed to 7 as per requirements
 
   const startInterview = async (title) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post(`${API_URL}/api/interview/start`, { job_title: title });
       setJobTitle(title);
-      setCurrentQuestion(response.data.question);
+      
+      // Use mock data for first question
+      const firstQuestion = getRandomQuestion(title, []);
+      setCurrentQuestion(firstQuestion.question);
+      setAskedQuestionIds([firstQuestion.id]);
+      
       setHistory([]);
+      setScores([]);
+      setAnswers([]);
       setLastScore(null);
       setSummary(null);
       setStage('interview');
@@ -47,53 +66,75 @@ function InterviewApp() {
   const handleAnswerSubmit = async (answer) => {
     setLoading(true);
     setError(null);
-    try {
-      const response = await axios.post(`${API_URL}/api/interview/answer`, {
-        user_answer: answer,
-        job_title: jobTitle,
-        current_question: currentQuestion,
-        question_history: history
-      });
+    
+    // Simulate AI processing delay
+    setTimeout(async () => {
+      try {
+        // Use mock scoring
+        const score = generateMockScore(answer);
+        const reasoning = generateMockReasoning(score, answer);
+        const strengths = generateMockStrengths(score, answer);
+        const improvements = generateMockImprovements(score, answer);
+        
+        const scoreData = { score, reasoning, good: strengths, improve: improvements };
+        
+        const newHistoryItem = {
+          question: currentQuestion,
+          answer,
+          scoreData
+        };
+        
+        const updatedHistory = [...history, newHistoryItem];
+        const updatedAnswers = [...answers, answer];
+        const updatedScores = [...scores, score];
+        
+        setHistory(updatedHistory);
+        setAnswers(updatedAnswers);
+        setScores(updatedScores);
+        setLastScore(scoreData);
 
-      const { score, reasoning, good, improve, follow_up_question } = response.data;
-      const scoreData = { score, reasoning, good, improve };
-      
-      const newHistoryItem = {
-        question: currentQuestion,
-        answer,
-        scoreData
-      };
-      
-      const updatedHistory = [...history, newHistoryItem];
-      setHistory(updatedHistory);
-      setLastScore(scoreData);
-
-      if (updatedHistory.length >= MAX_QUESTIONS) {
-        await finishInterview(updatedHistory);
-      } else {
-        setCurrentQuestion(follow_up_question);
+        if (updatedHistory.length >= MAX_QUESTIONS) {
+          await finishInterview(updatedHistory, updatedAnswers, updatedScores, title);
+        } else {
+          // Get the actual question object to find its follow-up
+          const currentQObj = mockQuestions[jobTitle]?.find(q => q.question === currentQuestion) || 
+                             mockQuestions['Software Engineer'].find(q => q.question === currentQuestion);
+                             
+          // If we just answered a main question, ask its follow up
+          if (currentQObj && currentQObj.followUp && !currentQuestion.includes(currentQObj.followUp)) {
+             setCurrentQuestion(currentQObj.followUp);
+          } else {
+             // If we just answered a follow-up, get a new random question
+             const nextQuestion = getRandomQuestion(jobTitle, askedQuestionIds);
+             setAskedQuestionIds([...askedQuestionIds, nextQuestion.id]);
+             setCurrentQuestion(nextQuestion.question);
+          }
+        }
+      } catch (err) {
+        setError('Failed to process answer. Please try again.');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Failed to process answer. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    }, 1500); // 1.5 second artificial delay
   };
 
-  const finishInterview = async (completedHistory) => {
+  const finishInterview = async (completedHistory, finalAnswers, finalScores, currentJobTitle) => {
     setLoading(true);
     setError(null);
-    try {
-      const response = await axios.post(`${API_URL}/api/interview/summary`, {
-        history: completedHistory
-      });
-      setSummary(response.data);
-      setStage('summary');
-    } catch (err) {
-      setError('Failed to generate summary. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    
+    // Simulate generation delay
+    setTimeout(() => {
+      try {
+        const titleToUse = currentJobTitle || jobTitle;
+        const mockSummary = generateMockSummary(titleToUse, finalAnswers || answers, finalScores || scores);
+        setSummary(mockSummary);
+        setStage('summary');
+      } catch (err) {
+        setError('Failed to generate summary. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }, 1500);
   };
 
   const resetInterview = () => {
@@ -103,6 +144,9 @@ function InterviewApp() {
     setCurrentQuestion('');
     setLastScore(null);
     setSummary(null);
+    setAskedQuestionIds([]);
+    setScores([]);
+    setAnswers([]);
   };
 
   return (
