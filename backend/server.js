@@ -19,7 +19,10 @@ if (process.env.MONGODB_URI) {
 }
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['https://job-interview-nine.vercel.app', 'http://localhost:5173', 'http://localhost:5174'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
