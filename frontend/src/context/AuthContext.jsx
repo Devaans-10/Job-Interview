@@ -1,14 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Mock user database (in memory)
-const MOCK_USERS = [
-  { 
-    id: '1', 
-    name: 'Devaans Patwari', 
-    email: 'pdevaans@gmail.com', 
-    password: 'Password123' 
-  }
-];
+// Starts empty - users signup on the fly
+let MOCK_USERS = [];
 
 // Create context
 const AuthContext = createContext(null);
