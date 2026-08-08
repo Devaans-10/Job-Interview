@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const interviewRoutes = require('./routes/interview');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/interview', interviewRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });

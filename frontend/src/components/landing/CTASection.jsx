@@ -1,25 +1,34 @@
-import FadeIn from './FadeIn';
 import { useNavigate } from 'react-router-dom';
+import FadeIn from './FadeIn';
 
 export default function CTASection() {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-gradient-to-r from-[#18011F] to-[#B600A8] py-20 md:py-28 px-5 relative overflow-hidden">
-      {/* Decorative patterns */}
-      <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+    <section className="relative w-full bg-premium-gradient text-center overflow-hidden">
+      {/* Dark semi-transparent overlay for text readability */}
+      <div className="absolute inset-0 bg-[#0C0C0C]/40 backdrop-blur-sm z-0"></div>
       
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="relative z-10 max-w-4xl mx-auto py-20 md:py-28 px-5">
         <FadeIn y={30}>
-          <h2 className="text-[clamp(2rem,8vw,3.5rem)] font-black tracking-tight text-white mb-6 leading-tight">
+          <h2 
+            className="text-[clamp(2rem,8vw,3.5rem)] font-black uppercase tracking-tight text-white mb-6"
+            style={{ textShadow: '0 2px 10px rgba(0, 0, 0, 0.4)' }}
+          >
             Ready to Ace Your Interview?
           </h2>
-          <p className="text-white/80 font-light text-lg md:text-2xl mb-12 max-w-2xl mx-auto">
-            Start practicing now and gain confidence for your real interview.
+        </FadeIn>
+        
+        <FadeIn delay={0.15} y={30}>
+          <p className="max-w-2xl mx-auto text-lg md:text-xl font-light text-white/95 mb-12 drop-shadow-md">
+            Start practicing now and gain the confidence you need to land your dream job. The AI is ready when you are.
           </p>
-          <button 
+        </FadeIn>
+        
+        <FadeIn delay={0.3} y={30}>
+          <button
             onClick={() => navigate('/interview')}
-            className="bg-white text-black px-12 py-4 rounded-full font-semibold uppercase tracking-wider text-sm md:text-base hover:scale-105 transition-transform duration-200 shadow-xl"
+            className="bg-white text-black font-semibold uppercase tracking-widest px-12 py-4 rounded-full transition-all duration-300 ease-out hover:scale-105 hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] active:scale-95"
           >
             Begin Interview
           </button>

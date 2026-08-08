@@ -109,3 +109,29 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .bg-premium-gradient {
+    background: linear-gradient(to top, #dbdcd7 0%, #dddcd7 24%, #e2c9cc 30%, #e7627d 46%, #b8235a 59%, #801357 71%, #3d1635 84%, #1c1a27 100%);
+  }
+
+  .bg-tech-gradient {
+    background: linear-gradient(135deg, #0C0C0C 0%, #1a1a2e 50%, #16213e 100%);
+  }
+
+  .bg-soft-gradient {
+    background: linear-gradient(180deg, #0C0C0C 0%, #1a1a2e 100%);
+  }
+
+  .text-gradient-hero {
+    background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+}

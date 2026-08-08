@@ -69,4 +69,40 @@ router.post('/summary', async (req, res) => {
   }
 });
 
+// POST /api/interview/tips
+// Input: history, jobTitle
+// Output: tips array
+router.post('/tips', async (req, res) => {
+  try {
+    const { history, jobTitle } = req.body;
+    
+    if (!history || !Array.isArray(history) || history.length === 0) {
+      return res.status(400).json({ error: 'history array is required' });
+    }
+    if (!jobTitle) {
+      return res.status(400).json({ error: 'jobTitle is required' });
+    }
+
+    const tips = await geminiService.generateTips(history, jobTitle);
+    res.json({ tips });
+  } catch (error) {
+    console.error('Error in /tips:', error);
+    // Generic fallback tips in case of failure
+    res.json({ tips: [
+      {
+        title: "Structure Your Answers",
+        description: "Use the STAR method (Situation, Task, Action, Result) to structure your behavioral answers more effectively.",
+        example: "Instead of 'I fixed the bug', say 'The system was crashing (S/T), so I rewrote the query (A), which reduced latency by 50% (R).'",
+        category: "clarity"
+      },
+      {
+        title: "Show Confidence",
+        description: "Speak clearly and confidently about your achievements.",
+        example: "Avoid filler words and own your success.",
+        category: "confidence"
+      }
+    ]});
+  }
+});
+
 module.exports = router;

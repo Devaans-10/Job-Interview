@@ -120,9 +120,53 @@ Example format:
   }
 }
 
+/**
+ * Generate specific, actionable interview tips based on the user's performance.
+ * @param {Array} history - Array of { question, answer, scoreData } objects.
+ * @param {string} jobTitle - The role being interviewed for.
+ * @returns {Promise<Array>} Array of tip objects.
+ */
+async function generateTips(history, jobTitle) {
+  const questionsList = history.map(h => h.question).join('\n');
+  const answersList = history.map(h => h.answer).join('\n');
+  const scoresList = history.map(h => h.scoreData.score).join('\n');
+
+  const prompt = `Based on this job interview for ${jobTitle}:
+- Questions asked: ${questionsList}
+- User answers: ${answersList}
+- Scores received: ${scoresList}
+
+Generate 4-5 specific, actionable interview tips. For each tip:
+- Identify a weakness or area to improve from their answers
+- Provide specific, actionable advice
+- Include example of what to say/do
+
+Format as JSON with array of objects: 
+[{
+  "title": "string",
+  "description": "string",
+  "example": "string",
+  "category": "confidence" | "technical" | "clarity" | "depth"
+}]
+
+Format the response strictly as valid JSON without any markdown formatting blocks like \`\`\`json.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text().trim();
+    text = text.replace(/^```json/i, '').replace(/```$/, '').trim();
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Error generating tips:", error);
+    throw error;
+  }
+}
+
 module.exports = {
   generateOpeningQuestion,
   scoreAnswer,
   generateFollowUpQuestion,
-  generateSummary
+  generateSummary,
+  generateTips
 };

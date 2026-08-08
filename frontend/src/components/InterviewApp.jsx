@@ -4,7 +4,10 @@ import ChatInterface from './ChatInterface';
 import ScoreDisplay from './ScoreDisplay';
 import SummaryReport from './SummaryReport';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { getInterviewHistory } from '../utils/localStorage';
+import { FaHistory, FaSignOutAlt, FaUser } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -18,6 +21,7 @@ function InterviewApp() {
   const [lastScore, setLastScore] = useState(null);
   const [summary, setSummary] = useState(null);
   
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const MAX_QUESTIONS = 5;
@@ -112,11 +116,39 @@ function InterviewApp() {
             AI Interview Agent
           </h1>
         </div>
-        {jobTitle && stage !== 'setup' && (
-          <span className="px-3 py-1 bg-[#B600A8]/20 border border-[#B600A8]/30 rounded-full text-xs font-medium text-[#D7E2EA]">
-            Role: {jobTitle}
-          </span>
-        )}
+        <div className="flex items-center gap-4">
+          {jobTitle && stage !== 'setup' && (
+            <span className="px-3 py-1 bg-[#B600A8]/20 border border-[#B600A8]/30 rounded-full text-xs font-medium text-[#D7E2EA] hidden sm:inline-block">
+              Role: {jobTitle}
+            </span>
+          )}
+          {getInterviewHistory(user?.userId).length > 0 && (
+            <Link 
+              to="/history"
+              className="flex items-center gap-2 text-sm font-medium text-[#D7E2EA]/70 hover:text-white transition-colors"
+            >
+              <FaHistory /> <span className="hidden sm:inline">History</span>
+            </Link>
+          )}
+          {user && (
+            <div className="flex items-center gap-4 ml-2 pl-4 border-l border-gray-700">
+              <div className="flex items-center gap-2 text-sm text-[#D7E2EA]">
+                <FaUser className="text-[#B600A8]" />
+                <span className="hidden sm:inline">{user.name}</span>
+              </div>
+              <button 
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }}
+                className="flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition-colors"
+                title="Logout"
+              >
+                <FaSignOutAlt />
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
@@ -152,7 +184,7 @@ function InterviewApp() {
 
         {stage === 'summary' && summary && (
           <div className="transition-all duration-500 ease-in-out transform">
-            <SummaryReport summary={summary} onRestart={resetInterview} />
+            <SummaryReport summary={summary} onRestart={resetInterview} history={history} jobTitle={jobTitle} />
           </div>
         )}
       </main>

@@ -4,6 +4,7 @@ import Features from './Features';
 import HowItWorks from './HowItWorks';
 import DemoPreview from './DemoPreview';
 import CTASection from './CTASection';
+import ContactSection from './ContactSection';
 import Footer from './Footer';
 
 export default function LandingPage() {
@@ -15,6 +16,7 @@ export default function LandingPage() {
       <HowItWorks />
       <DemoPreview />
       <CTASection />
+      <ContactSection />
       <Footer />
     </div>
   );

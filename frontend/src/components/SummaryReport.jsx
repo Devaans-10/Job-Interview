@@ -1,6 +1,25 @@
-import { FaRedo, FaTrophy, FaStar, FaArrowUp, FaBullseye } from 'react-icons/fa';
+import { useEffect, useRef } from 'react';
+import { FaRedo, FaTrophy, FaStar, FaArrowUp, FaBullseye, FaHistory } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import InterviewTips from './InterviewTips';
+import { saveInterview } from '../utils/localStorage';
+import { useAuth } from '../context/AuthContext';
 
-export default function SummaryReport({ summary, onRestart }) {
+export default function SummaryReport({ summary, onRestart, history, jobTitle, isHistoryView = false }) {
+  const hasSaved = useRef(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (summary && !isHistoryView && !hasSaved.current) {
+      saveInterview({
+        jobTitle,
+        summary,
+        history,
+        overallScore: summary.overall_score
+      }, user?.userId);
+      hasSaved.current = true;
+    }
+  }, [summary, isHistoryView, jobTitle, history, user]);
   if (!summary) return null;
 
   const { overall_score, strengths, improvements, feedback } = summary;
@@ -98,14 +117,26 @@ export default function SummaryReport({ summary, onRestart }) {
         </div>
       </div>
 
+      {/* AI Interview Tips */}
+      <InterviewTips history={history} jobTitle={jobTitle} />
+
       {/* Actions */}
-      <div className="flex justify-center pt-4 pb-12">
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4 pb-12">
         <button
           onClick={onRestart}
-          className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all duration-300 hover:-translate-y-1"
+          className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transition-all duration-300 hover:-translate-y-1"
         >
-          <FaRedo /> Start New Interview
+          <FaRedo /> {isHistoryView ? 'Back to History' : 'Start New Interview'}
         </button>
+        
+        {!isHistoryView && (
+          <Link
+            to="/history"
+            className="flex items-center justify-center gap-3 w-full sm:w-auto px-8 py-4 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(0,0,0,0.3)] hover:shadow-[0_0_30px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1"
+          >
+            <FaHistory /> View All Interviews
+          </Link>
+        )}
       </div>
     </div>
   );
